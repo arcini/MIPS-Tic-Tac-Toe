@@ -25,6 +25,8 @@ scoreunderline: .asciiz "\n -----------"
 .text 0x3000
 .globl main
 
+addi $t1, $0, 1 #current player, 1 for player 1, 2 for player 2 (starts with 1)
+
 main:
 	#----- print the scores -----#
 	la $a0, scores($0)
@@ -46,7 +48,6 @@ main:
 	ori $v0, $0, 1
 	syscall
 
-	addi $t1, $0, 1 #current player, 1 for player 1, 2 for player 2 (starts with 1), 0 for endgame
 	addi $s0, $0, 1 #player 1 is X
 	addi $s1, $0, 2 #player 2 is O
 	addi $t0, $0, 9 #counter, starts at max amount of moves left (for cat)
@@ -455,4 +456,3 @@ restart:
 end:
 	ori $v0, $0, 10 #end program
 	syscall
-	
