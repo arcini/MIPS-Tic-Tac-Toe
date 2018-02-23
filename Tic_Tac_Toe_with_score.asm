@@ -1,25 +1,25 @@
 .data 0x0
 board: .word 0,0,0,0,0,0,0,0,0
-xwin: .asciiz "\n X wins!!"
-owin: .asciiz "\n O wins!!"
+xwin: .asciiz "\n * Player 1 wins!!"
+owin: .asciiz "\n * Player 2 wins!!"
 cat: .asciiz "\n Cat game!!"
 x: .byte 0x58, 0
 o: .byte, 0xD8, 0
-linedash: .byte 0xA, 0x20, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0
+linedash: .byte 0xa, 0x20, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0
 vert: .byte 0x20, 0x7C, 0x20, 0
 nl: .asciiz "\n"
 space: .asciiz "  "
 xcont: .asciiz "\n Player 1, input your move!"
 ocont: .asciiz "\n Player 2, input your move!"
 badmove: .asciiz "\n Invalid move! Please try again."
-anotherone: .asciiz "\n Would you like to play again? (1 for Yes, 0 for No)"
+anotherone: .asciiz "\n * Would you like to play again? (1 for Yes, 0 for No)"
 player1score: .word 0
 player2score: .word 0
 scorestring1: .asciiz "\n Player 1: " 
 scorestring2: .asciiz "\n Player 2: "
 scores: .asciiz "\n Scores"
 scoreunderline: .asciiz "\n -----------"
-
+winline: .asciiz " *******************************************************"
 
 
 .text 0x3000
@@ -28,6 +28,7 @@ scoreunderline: .asciiz "\n -----------"
 addi $t1, $0, 1 #current player, 1 for player 1, 2 for player 2 (starts with 1)
 
 main:
+	jal newline #put a line between the last game and the next game
 	#----- print the scores -----#
 	la $a0, scores($0)
 	ori $v0, $0, 4
@@ -347,6 +348,10 @@ actualwin:
 	beq $t3, 2, twowon #a two means player two has won
 	
 onewon:
+	jal newline #puts asteriks on new line
+	la $a0, winline($0) #prints lots of asteriks
+	ori $v0, $0, 4
+	syscall	
 	la $a0, xwin($0) 
 	ori $v0, $0, 4
 	syscall #print win statement
@@ -382,6 +387,10 @@ onewon:
 	j restart #goto restart
 	
 twowon:
+	jal newline #puts asteriks on next line
+	la $a0, winline($0) #prints lots of asteriks
+	ori $v0, $0, 4
+	syscall	
 	la $a0, owin($0)
 	ori $v0, $0, 4
 	syscall #print win statement
@@ -433,7 +442,10 @@ restart:
 	ori $v0, $0, 5 #input integer (1 for yes, 0 for no)
 	syscall
 	beq $v0, $0, end #if player says 0, end the program
-	ori $t9, $0, 0 #otherwise, reset the board
+	la $a0, winline($0) #prints lots of asteriks
+	ori $v0, $0, 4
+	syscall	
+	ori $t9, $0, 0 #reset the board
 	sw $0, board($t9)
 	ori $t9, $0, 4
 	sw $0, board($t9)
@@ -456,3 +468,4 @@ restart:
 end:
 	ori $v0, $0, 10 #end program
 	syscall
+	
